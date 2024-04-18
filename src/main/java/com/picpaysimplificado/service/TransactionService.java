@@ -20,10 +20,17 @@ public class TransactionService {
     private UserService userService;
     @Autowired
     private TransactionRepository repository;
+
+    @Autowired
+    private AuthorizationService authService;
+
     @Autowired
     private RestTemplate restTemplate;  //class to do http communication between services
 
-    public void createTransaction (TransactionDTO transaction) throws Exception{
+    @Autowired
+    private NotificationService notificationService;
+
+    public Transaction createTransaction (TransactionDTO transaction) throws Exception{
         //user validations
         User sender = this.userService.findUserById(transaction.senderId());
         User receiver = this.userService.findUserById(transaction.receiverId());
@@ -31,10 +38,10 @@ public class TransactionService {
         userService.validateTransaction(sender, transaction.value());
 
         //return of the authorize transaction if it was not authorized
-        boolean isAuthorized = this.authorizeTransaction(sender, transaction.value());
+        boolean isAuthorized = this.authService.authorizeTransaction(sender, transaction.value());
         if (!isAuthorized){
             throw new Exception("Transação não autorizada");
-        }
+       }
 
         //creating a transaction
         Transaction newTransaction = new Transaction();
@@ -51,17 +58,11 @@ public class TransactionService {
         this.repository.save(newTransaction);
         this.userService.saveUser(sender);
         this.userService.saveUser(receiver);
-    }
 
-    //external authorizing service
-    public boolean authorizeTransaction (User sender, BigDecimal value){
-      ResponseEntity<Map> authrorizationResponse = restTemplate.getForEntity("https://run.mocky.io/v3/5794d450-d2e2-4412-8131-73d0293ac1cc", Map.class);
-      //if the status of the authorization response is status 200, it will compare the body message and return true or false
-      if (authrorizationResponse.getStatusCode() == HttpStatus.OK){
-          String message = (String) authrorizationResponse.getBody().get("message");
-          return "Autorizado".equalsIgnoreCase(message);
-      }else
-          return false;
+        this.notificationService.sendNotification(sender, "Transação realizada com sucesso");
+        this.notificationService.sendNotification(receiver, "Transação recebida com sucesso");
+
+        return newTransaction;
     }
 
 }
