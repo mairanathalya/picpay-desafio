@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ControllerExceptionHandler {
 
-    //excção para dois usuarios cadastrados com o mesmo documento, tratar os duplicados
+    //exception for two users registered with the same document, treat duplicates
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity threatDuplicateEntry (DataIntegrityViolationException exception){
         ExceptionDTO exceptionDTO = new ExceptionDTO("Usuário já cadastrado", "400");
@@ -23,7 +23,7 @@ public class ControllerExceptionHandler {
         return ResponseEntity.notFound().build();
     }
 
-    //exeeção geral
+    //general exception
     @ExceptionHandler(Exception.class)
     public ResponseEntity threatGeneralException(Exception exception){
         ExceptionDTO exceptionDTO = new ExceptionDTO(exception.getMessage(), "500");
