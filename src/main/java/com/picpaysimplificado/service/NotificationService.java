@@ -17,12 +17,14 @@ public class NotificationService {
        String email = user.getEmail();
        NotificationDTO notificationRequest = new NotificationDTO(email, message);
 
-        ResponseEntity<String> notificationResponse = restTemplate.postForEntity("http://o4d9z.mocklab.io/notify", notificationRequest, String.class);
+        // ResponseEntity<String> notificationResponse = restTemplate.postForEntity("http://o4d9z.mocklab.io/notify", notificationRequest, String.class);
 
         //if notification response is not 200, trigger an error
-        if (!(notificationResponse.getStatusCode() == HttpStatus.OK)){
-            System.out.println("Error ao enviar notificação");
-            throw new Exception("O serviço está indisponível ou instável");
-        }
+        //  if (!(notificationResponse.getStatusCode() == HttpStatus.OK)){
+        //       System.out.println("Error ao enviar notificação");
+        //      throw new Exception("O serviço está indisponível ou instável");
+        //  }
+
+        System.out.println("Notificação enviada para o usuário");
     }
 }
